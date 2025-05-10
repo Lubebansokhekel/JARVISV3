@@ -9,7 +9,7 @@
 - Mode panel Termux menggunakan **tmux** untuk manajemen jendela dan pane yang fleksibel  
 - Informasi **cuaca** terkini  
 - **Track IP** untuk pelacakan alamat IP  
-- **Kontrol Termux lewat AI** dengan perintah suara dan teks  
+- **Kontrol Termux lewat AI** dengan perintah biasa
 
 ---
 
@@ -28,27 +28,8 @@ cd JARVISV3
 bash JARVISV3.sh
 
 text
-
 ---
-
-## Cara Menggunakan Tmux di Termux
-
-- Jalankan tmux dengan perintah:
-
-tmux
-
-text
-
-- Membagi pane vertikal: `Ctrl + b` lalu `%`  
-- Membagi pane horizontal: `Ctrl + b` lalu `"`  
-- Navigasi antar pane dengan klik pada pane yang diinginkan  
-- Keluar dari pane dengan mengetik `exit`  
-- Membuat jendela baru: `Ctrl + b` lalu `c`  
-- Detach session: `Ctrl + b` lalu `d`  
-- Reattach session: `tmux attach`
-
-Tmux membantu mengorganisasi tugas dengan banyak jendela dan pane, meningkatkan produktivitas di Termux.
-
+ketik help untuk melihat semua fiturnya
 ---
 
 ## Donasi
