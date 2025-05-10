@@ -27,6 +27,7 @@ pip install rich rich-cli
 git clone https://github.com/Lubebansokhekel/JARVISV3
 cd JARVISV3
 bash JARVISV3.sh
+
 ---
 ## Donasi
 
