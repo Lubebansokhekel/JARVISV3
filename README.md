@@ -20,6 +20,7 @@
 Jalankan perintah berikut di Termux secara berurutan:
 
 ```bash
+pkg update && pkg upgrade
 pkg install neofetch curl jq git ossp-uuid -y
 pkg install ncurses-utils xz-utils nodejs -y
 pkg install nodejs-lts python python3 -y
