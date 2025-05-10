@@ -4,20 +4,22 @@
 
 ---
 
-## Fitur
+## Fitur Unggulan
 
-- Mode panel Termux menggunakan **tmux** untuk manajemen jendela dan pane yang fleksibel  
-- Informasi **cuaca** terkini  
-- **Track IP** untuk pelacakan alamat IP  
-- **Kontrol Termux lewat AI** dengan perintah teks
+- Tampilan panel Termux menggunakan **tmux** untuk manajemen jendela dan pane yang fleksibel  
+- Menampilkan informasi **cuaca terkini**  
+- **Lacak alamat IP** secara langsung  
+- **Kontrol Termux dengan perintah teks AI**
 
-> **Ketik `help` di dalam tools untuk menampilkan daftar fitur dan petunjuk penggunaan.**
+> Ketik `help` di dalam tool untuk melihat daftar lengkap fitur dan panduan penggunaan.
 
 ---
 
 ## Instalasi
 
 Jalankan perintah berikut di Termux secara berurutan:
+
+```bash
 pkg install neofetch curl jq git ossp-uuid -y
 pkg install ncurses-utils xz-utils nodejs -y
 pkg install nodejs-lts python python3 -y
