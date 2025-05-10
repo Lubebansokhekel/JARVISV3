@@ -18,7 +18,6 @@
 ## Instalasi
 
 Jalankan perintah berikut di Termux secara berurutan:
-
 pkg install neofetch curl jq git ossp-uuid -y
 pkg install ncurses-utils xz-utils nodejs -y
 pkg install nodejs-lts python python3 -y
@@ -28,10 +27,6 @@ pip install rich rich-cli
 git clone https://github.com/Lubebansokhekel/JARVISV3
 cd JARVISV3
 bash JARVISV3.sh
-
-text
-
----
 
 ## Donasi
 
