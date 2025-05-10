@@ -9,14 +9,16 @@
 - Mode panel Termux menggunakan **tmux** untuk manajemen jendela dan pane yang fleksibel  
 - Informasi **cuaca** terkini  
 - **Track IP** untuk pelacakan alamat IP  
-- **Kontrol Termux lewat AI** dengan perintah biasa
+- **Kontrol Termux lewat AI** dengan perintah teks
+
+> **Ketik `help` di dalam tools untuk menampilkan daftar fitur dan petunjuk penggunaan.**
 
 ---
 
 ## Instalasi
 
 Jalankan perintah berikut di Termux secara berurutan:
-pkg udpate && pkg upgrade
+
 pkg install neofetch curl jq git ossp-uuid -y
 pkg install ncurses-utils xz-utils nodejs -y
 pkg install nodejs-lts python python3 -y
@@ -28,8 +30,7 @@ cd JARVISV3
 bash JARVISV3.sh
 
 text
----
-ketik help untuk melihat semua fiturnya
+
 ---
 
 ## Donasi
@@ -44,4 +45,4 @@ Atau beli tool versi 5 seharga 15.000 IDR di:
 
 ---
 
-Jarvis AI Termux mengubah Termux menjadi asisten cerdas dengan perintah suara dan teks, membantu otomatisasi dan interaksi yang lebih mudah di terminal.
+Jarvis AI Termux mengubah Termux menjadi asisten cerdas dengan perintah teks, membantu otomatisasi dan interaksi yang lebih mudah di terminal.
