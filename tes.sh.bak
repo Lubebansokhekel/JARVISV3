@@ -1,0 +1,168 @@
+#!/bin/bash
+CONFIG_FILE="$HOME/.Hina_AI"
+counter=1
+alur="$HOME/JARVISV3"
+letak="/sound"
+CACHE_FILE="$HOME/.jarvis_cache"
+hancurkan_diri() {
+     pkill -9 com.termux
+}
+if ! grep -q 'com.termux' /proc/$$/cmdline 2> /dev/null; then
+     echo -e "${m}[ ENV ERROR ]$c Hanya untuk Termux${NC}" >&2
+     exit 0
+fi
+deteksi_dir() {
+     cek="$HOME/JARVISV3/.git/refs/remotes/origin/HEAD"
+     echo -ne "\r${k}[ CHECK DIR ]$c Memeriksa Direktori   ${NC}"
+     sleep 1
+     if [[ -f "$cek" ]]; then
+          echo -ne "\r${h}[ ✓ ]$c Direktory Aman           ${NC}"
+     else
+          echo -ne "\r${h}[ x ]$c Terdeteksi Direktori Dimodifikasi           ${NC}"
+          rm -rf $HOME/JARVISV3
+          hancurkan_diri
+     fi
+}
+deteksi_debugger() {
+     echo -ne "\r${k}[ DEBUG CHECK ]$c Memeriksa debugger${NC}"
+     sleep 1
+     local ppid=$(awk '{print $4}' /proc/$$/stat 2> /dev/null)
+     local pname=$(ps -p $ppid -o comm= 2> /dev/null)
+     local debuggers=("strace" "ltrace" "gdb" "lldb" "frida" "ida" "radare2" "ghidra")
+
+     for dbg in "${debuggers[@]}"; do
+          if [[ "$pname" =~ $dbg ]]; then
+               echo -ne "\r${m}[ x ]$c Debugger parent terdeteksi: $pname${NC}" >&2
+               hancurkan_diri
+          fi
+          if pgrep -x "$dbg" > /dev/null; then
+               echo -ne "\r${m}[ x ]$c Proses debugger aktif: $dbg${NC}" >&2
+               hancurkan_diri
+          fi
+     done
+
+     local tracer=$(awk -F':' '/TracerPid/{print $2}' /proc/$$/status | tr -d ' \t')
+     if [ "$tracer" != "0" ]; then
+          echo -ne "\r${m}[ x ]$c Proses sedang di-trace (PID: $tracer)${NC}" >&2
+          hancurkan_diri
+     fi
+     echo -ne "\r${h}[ ✓ ]$c Tidak ada debugger terdeteksi           ${NC}"
+}
+
+deteksi_sniffer() {
+     echo -ne "\r${k}[ SNIFFER CHECK ]$c Memeriksa sniffer jaringan${NC}"
+     sleep 1
+     local sniffers=("tcpdump" "tshark" "ettercap" "ngrep" "wireshark" "fiddler" "charles")
+
+     for sniffer in "${sniffers[@]}"; do
+          if pgrep -x "$sniffer" > /dev/null; then
+               echo -ne "\r${m}[ x ]$c Sniffer aktif terdeteksi: $sniffer${NC}" >&2
+               hancurkan_diri
+          fi
+     done
+
+     if lsof -p $$ 2> /dev/null | grep -q 'libtermux-net.so'; then
+          echo -ne "\r${m}[ x ]$c Monitoring jaringan Termux terdeteksi${NC}" >&2
+          hancurkan_diri
+     fi
+     echo -ne "\r${h}[ ✓ ]$c Tidak ada sniffer terdeteksi                     ${NC}"
+}
+
+detect_vpn() {
+     echo -ne "\r${k}[ NET ]$c Mengecek koneksi internet.  ${NC}"
+     sleep 1
+     if curl -s --head --connect-timeout 3 "https://clients3.google.com/generate_204" > /dev/null ||
+          curl -s --head --connect-timeout 3 "https://1.1.1.1" > /dev/null; then
+          echo -ne "\r${h}[ ✓ ]$c Koneksi internet tersedia.    ${NC}"
+     else
+          echo -ne "\r${m}[ x ]$c Tidak ada koneksi internet atau curl gagal.   ${NC}" >&2
+          hancurkan_diri
+     fi
+     echo -ne "\r${k}[ VPN ]$c Memeriksa VPN/Proxy   ${NC}"
+     sleep 1
+     local vpn_interfaces=$(ip link show 2> /dev/null | grep -E 'tun|tap|ppp|wireguard|openvpn')
+     if [ -n "$vpn_interfaces" ]; then
+          echo -ne "\r${m}[ x ]$c Interface VPN terdeteksi:${NC}" >&2
+          hancurkan_diri
+     fi
+
+     local vpn_providers=("nordvpn" "expressvpn" "surfshark" "windscribe" "protonvpn" "openvpn")
+     for provider in "${vpn_providers[@]}"; do
+          if pgrep -x "$provider" > /dev/null; then
+               echo -ne "\r${m}[ x ]$c Proses VPN aktif: $provider${NC}" >&2
+               hancurkan_diri
+          fi
+     done
+
+     if curl -s --connect-timeout 3 https://check.torproject.org/ | grep -q "Congratulations"; then
+          echo -ne "\r${m}[ x ]$c Jaringan TOR terdeteksi${NC}" >&2
+          hancurkan_diri
+     fi
+     echo -ne "\r${k}[ GEO CHECK ]$c Memverifikasi lokasi.   ${NC}"
+     sleep 1
+     country=$(curl -s --connect-timeout 3 --max-time 5 "http://ip-api.com/line?fields=countryCode" | tr -d '[:space:]')
+
+     if [ -z "$country" ]; then
+          echo -ne "\r${y}[ x ]$c Gagal memeriksa lokasi${NC}"
+     elif [ "$country" != "ID" ]; then
+          echo -ne "\r${m}[ x ]$c Lokasi tidak sesuai: $country${NC}" >&2
+          hancurkan_diri
+     else
+          echo -ne "\r${h}[ ✓ ]$c Lokasi Indonesia terkonfirmasi${NC}"
+     fi
+}
+
+realtime_system() {
+     while true; do
+          echo -e "${k}[ REALTIME CHECK ]$c Memantau sistem${NC}"
+          deteksi_dir
+          deteksi_debugger
+          deteksi_sniffer
+          detect_vpn
+          sleep 1
+     done
+}
+realtime_system &> /dev/null &
+cat << 'JARVIS_LAUNCHER' > $PREFIX/bin/jarvis
+#!/bin/bash
+while true; do
+cek="$HOME/JARVISV3"
+if [[ -d "$cek" ]]; then
+cd "$cek"
+git pull origin main
+git stash
+bash JARVISV3.sh
+exit 0
+else
+pkg update
+pkg upgrade
+pkg install jq curl sox mpv -y
+cd $HOME
+git clone https://github.com/Lubebansokhekel/JARVISV3
+cd JARVISV3
+fi
+done
+JARVIS_LAUNCHER
+chmod +x $PREFIX/bin/jarvis
+packages=(jq curl sox mpv)
+pkg update -y && pkg upgrade -y
+for pkg_name in "${packages[@]}"; do
+     if ! command -v "$pkg_name" &> /dev/null; then
+          echo "Menginstal $pkg_name..."
+          pkg install -y "$pkg_name"
+     else
+          echo "$pkg_name sudah terpasang."
+     fi
+done
+echo "Instalasi selesai."
+cek="$PREFIX/include/bash/include/Version"
+echo -ne "\r${k}[ CHECK AKSES ]$c Memeriksa Akses   ${NC}"
+sleep 1
+if [[ -f "$cek" ]]; then
+     echo -ne "\r${h}[ ✓ ]$c Penguna Toolsv5  Terdeteksi         ${NC}"
+else
+     echo -ne "\r${h}[ x ]$c Script Ini Hanya Untuk Penguna TOOLSV5  ${NC}"
+     rm -rf $HOME/JARVISV3
+     hancurkan_diri
+fi
+
